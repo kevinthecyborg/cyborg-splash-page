@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    {{> partials/head
+      title="Cyborg"
+      description="The next chapter of human evolution is near."
+    }}
+  </head>
+  <body style="background: #000;">
+
+    <section class="py-8 py-md-11">
+      <div class="container">
+        <div class="row justify-content-between align-items-center">
+          <div class="col-12 col-md-6">
+            <img src="{{webRoot}}/assets/img/cyborg-logo.svg" alt="Cyborg Logo" class="mb-6" style="max-width:200px; display:block;">
+            <!-- Terminal -->
+            <code class="highlight" data-typed='{"loop":false, "typeSpeed":25, "strings": ["&gt;&nbsp;$&nbsp;initialize&nbsp;cyborg<br/><span class=\"text-body-secondary\">Initializing Cyborg&nbsp;Upgrade&nbsp;Protocol..<br/>Loading&nbsp;neural&nbsp;interfaces..<br/>Syncing&nbsp;with&nbsp;global&nbsp;AI&nbsp;network..<br/><span class=\"text-primary\">Evolution&nbsp;sequence&nbsp;ready.</span></span><br/><br/>&gt;&nbsp;$&nbsp;run cyborg<br/><span class=\"text-body-secondary\">Analyzing&nbsp;current&nbsp;capabilities..<br/>Projecting&nbsp;potential&nbsp;enhancements..<br/>The&nbsp;next&nbsp;chapter&nbsp;of&nbsp;human&nbsp;evolution&nbsp;is&nbsp;near..<br/><span class=\"text-primary\">Are&nbsp;you&nbsp;ready&nbsp;to&nbsp;transcend&nbsp;and&nbsp;become&nbsp;a&nbsp;cyborg?</span> </span><br/><br/>&gt;&nbsp;$&nbsp;await_user_confirmation<br/><span class=\"text-body-secondary\">Awaiting&nbsp;user&nbsp;input..<br/>To&nbsp;proceed&nbsp;with&nbsp;cyberware&nbsp;upgrades,&nbsp;user&nbsp;email&nbsp;required..<br/><span class=\"text-primary\">Enter&nbsp;your&nbsp;email&nbsp;to&nbsp;be&nbsp;notified&nbsp;when&nbsp;we&nbsp;launch.</span></span>"]}' style="min-height: 183px;"></code>
+          </div>
+        </div> <!-- / .row -->
+
+        <style>
+          .fade-in {
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+          }
+        </style>
+        <div class="row justify-content-between align-items-center fade-in" id="fadeElement">
+          <div class="col-12 col-md-6 pt-7">
+            <script async data-uid="01c20ba040" src="https://cyborg.ck.page/01c20ba040/index.js"></script>
+          </div>
+        </div> <!-- / .row -->
+      </div> <!-- / .container -->
+    </section>
+
+    <script>
+      setTimeout(() => {
+        const element = document.getElementById('fadeElement');
+        element.style.opacity = 1;
+      }, 19000);
+    </script>
+
+    <!-- JAVASCRIPT -->
+    {{> partials/scripts}}
+
+  </body>
+</html>
