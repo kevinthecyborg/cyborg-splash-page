@@ -15,6 +15,7 @@ const paths = {
     img: './src/img',
     js: './src/js',
     scss: './src/scss',
+    audio: './src/audio',
   },
   dist: {
     css: './assets/css',
@@ -22,6 +23,7 @@ const paths = {
     fonts: './assets/fonts',
     img: './assets/img',
     js: './assets/js',
+    audio: './assets/audio',
   },
 };
 
@@ -101,6 +103,10 @@ module.exports = {
         {
           from: paths.src.img,
           to: paths.dist.img,
+        },
+        {
+          from: paths.src.audio,
+          to: paths.dist.audio,
         },
       ],
     }),

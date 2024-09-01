@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retro Terminal Effect with CRT Sound</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #00ff00;
+      font-family: monospace;
+    }
+    #debug-info {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    #audio-status {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="content">
+    <h1>Cyborg.AI</h1>
+    <p>The next chapter of human evolution is near.</p>
+    <p>Are you ready to transcend and become a cyborg?</p>
+    <button id="sound-toggle">Enable Sound</button>
+  </div>
+  <div id="debug-info"></div>
+  <div id="audio-status">Audio Status: Not Playing</div>
+
+  <audio id="background-audio" loop>
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-electric-power-station-electric-buzz-2656.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    const backgroundAudio = document.getElementById('background-audio');
+    const debugInfo = document.getElementById('debug-info');
+    const soundToggle = document.getElementById('sound-toggle');
+    const audioStatus = document.getElementById('audio-status');
+    let isSoundOn = false;
+    let isToggling = false;
+
+    function updateDebugInfo(message) {
+      const timestamp = new Date().toLocaleTimeString();
+      debugInfo.innerHTML += `[${timestamp}] ${message}<br>`;
+      debugInfo.scrollTop = debugInfo.scrollHeight;
+      console.log(`[${timestamp}] ${message}`);
+    }
+
+    function updateAudioStatus(status) {
+      audioStatus.textContent = `Audio Status: ${status}`;
+    }
+
+    function logAudioState() {
+      const states = ['HAVE_NOTHING', 'HAVE_METADATA', 'HAVE_CURRENT_DATA', 'HAVE_FUTURE_DATA', 'HAVE_ENOUGH_DATA'];
+      const networkStates = ['NETWORK_EMPTY', 'NETWORK_IDLE', 'NETWORK_LOADING', 'NETWORK_NO_SOURCE'];
+      updateDebugInfo(`Audio state: readyState=${states[backgroundAudio.readyState]}, networkState=${networkStates[backgroundAudio.networkState]}, paused=${backgroundAudio.paused}, currentTime=${backgroundAudio.currentTime}, volume=${backgroundAudio.volume}`);
+    }
+
+    async function toggleSound() {
+      if (isToggling) return;
+      isToggling = true;
+
+      try {
+        isSoundOn = !isSoundOn;
+        updateDebugInfo(`Attempting to ${isSoundOn ? 'play' : 'pause'} audio...`);
+
+        if (isSoundOn) {
+          backgroundAudio.volume = 0.1;  // Set a lower volume for ambient sound
+          let playPromise = backgroundAudio.play();
+          if (playPromise !== undefined) {
+            await playPromise;
+            updateDebugInfo('Background audio playing');
+            updateAudioStatus('Playing');
+          } else {
+            updateDebugInfo('Play promise was undefined, audio may not have started');
+            updateAudioStatus('May Not Be Playing');
+          }
+          soundToggle.textContent = 'Mute Sound';
+        } else {
+          backgroundAudio.pause();
+          updateDebugInfo('Background audio paused');
+          updateAudioStatus('Paused');
+          soundToggle.textContent = 'Enable Sound';
+        }
+      } catch (error) {
+        updateDebugInfo(`Error with audio: ${error.name} - ${error.message}`);
+        updateAudioStatus('Error');
+        if (error.name === 'NotAllowedError') {
+          updateDebugInfo('Autoplay prevented. Please click anywhere to enable audio.');
+          document.addEventListener('click', attemptPlayOnUserGesture, { once: true });
+        }
+        isSoundOn = false;
+      } finally {
+        logAudioState();
+        isToggling = false;
+      }
+    }
+
+    function attemptPlayOnUserGesture() {
+      backgroundAudio.volume = 0.1;  // Set a lower volume for ambient sound
+      backgroundAudio.play()
+        .then(() => {
+          updateDebugInfo('Audio started after user gesture');
+          updateAudioStatus('Playing');
+          isSoundOn = true;
+          soundToggle.textContent = 'Mute Sound';
+        })
+        .catch(error => {
+          updateDebugInfo(`Error playing audio after user gesture: ${error.message}`);
+          updateAudioStatus('Error');
+        });
+    }
+
+    // Event listeners
+    soundToggle.addEventListener('click', toggleSound);
+
+    // Audio element event listeners
+    backgroundAudio.addEventListener('loadeddata', () => {
+      updateDebugInfo('Audio data loaded');
+      logAudioState();
+    });
+
+    backgroundAudio.addEventListener('canplaythrough', () => {
+      updateDebugInfo('Audio can play through');
+      logAudioState();
+    });
+
+    backgroundAudio.addEventListener('playing', () => {
+      updateDebugInfo('Audio started playing');
+      updateAudioStatus('Playing');
+    });
+
+    backgroundAudio.addEventListener('pause', () => {
+      updateDebugInfo('Audio paused');
+      updateAudioStatus('Paused');
+    });
+
+    backgroundAudio.addEventListener('ended', () => {
+      updateDebugInfo('Audio ended');
+      updateAudioStatus('Ended');
+    });
+
+    backgroundAudio.addEventListener('error', (e) => {
+      updateDebugInfo(`Audio error: ${e.target.error ? e.target.error.message : 'Unknown error'}`);
+      updateAudioStatus('Error');
+    });
+
+    // Initialize
+    updateDebugInfo('Page loaded');
+    updateAudioStatus('Not Playing');
+    soundToggle.textContent = 'Enable Sound';
+    logAudioState();
+
+    // Additional debugging
+    window.onerror = function(message, source, lineno, colno, error) {
+      updateDebugInfo(`Global error: ${message} at ${source}:${lineno}:${colno}`);
+    };
+  </script>
+</body>
+</html>

@@ -1,62 +1,402 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="./assets/favicon/favicon.png" type="image/x-icon">
-    
-    <!-- Libs CSS -->
-    <link rel="stylesheet" href="./assets/css/libs.bundle.css">
-    
-    <!-- Theme CSS -->
-    <link rel="stylesheet" href="./assets/css/theme.bundle.css">
-    
-    <!-- Title -->
-    <title>Cyborg</title>
-    
-    <!-- Description -->
-    <meta name="description" content="The next chapter of human evolution is near."/>  </head>
-  <body style="background: #000;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="shortcut icon" href="./assets/favicon/favicon.png" type="image/x-icon">
+  <title>Cyborg</title>
+  <meta name="description" content="The next chapter in human evolution."/>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
-    <section class="py-8 py-md-11">
-      <div class="container">
-        <div class="row justify-content-between align-items-center">
-          <div class="col-12 col-md-6">
-            <img src="./assets/img/cyborg-logo.svg" alt="Cyborg Logo" class="mb-6" style="max-width:200px; display:block;">
-            <!-- Terminal -->
-            <code class="highlight" data-typed='{"loop":false, "typeSpeed":25, "strings": ["&gt;&nbsp;$&nbsp;initialize&nbsp;cyborg<br/><span class=\"text-body-secondary\">Initializing Cyborg&nbsp;Upgrade&nbsp;Protocol..<br/>Loading&nbsp;neural&nbsp;interfaces..<br/>Syncing&nbsp;with&nbsp;global&nbsp;AI&nbsp;network..<br/><span class=\"text-primary\">Evolution&nbsp;sequence&nbsp;ready.</span></span><br/><br/>&gt;&nbsp;$&nbsp;run cyborg<br/><span class=\"text-body-secondary\">Analyzing&nbsp;current&nbsp;capabilities..<br/>Projecting&nbsp;potential&nbsp;enhancements..<br/>The&nbsp;next&nbsp;chapter&nbsp;of&nbsp;human&nbsp;evolution&nbsp;is&nbsp;near..<br/><span class=\"text-primary\">Are&nbsp;you&nbsp;ready&nbsp;to&nbsp;transcend&nbsp;and&nbsp;become&nbsp;a&nbsp;cyborg?</span> </span><br/><br/>&gt;&nbsp;$&nbsp;await_user_confirmation<br/><span class=\"text-body-secondary\">Awaiting&nbsp;user&nbsp;input..<br/>To&nbsp;proceed&nbsp;with&nbsp;cyberware&nbsp;upgrades,&nbsp;user&nbsp;email&nbsp;required..<br/><span class=\"text-primary\">Enter&nbsp;your&nbsp;email&nbsp;to&nbsp;be&nbsp;notified&nbsp;when&nbsp;we&nbsp;launch.</span></span>"]}' style="min-height: 183px;"></code>
-          </div>
-        </div> <!-- / .row -->
+    :root {
+      --indigo: #1A42F4;
+      --light-indigo: #4B7BFF;
+      --black: #000000;
+    }
 
-        <style>
-          .fade-in {
-            opacity: 0;
-            transition: opacity 2s ease-in-out;
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'VT323', monospace;
+      background-color: var(--black);
+      color: var(--indigo);
+    }
+
+    #terminal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+
+    .header {
+      text-align: center;
+      font-size: 24px;
+      padding: 10px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .terminal-area {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 20px;
+      overflow-y: auto;
+      font-size: 24px;
+      line-height: 1.4;
+    }
+
+    #terminalText {
+      text-align: left;
+      align-self: flex-start;
+    }
+
+    .start-prompt {
+      font-size: 32px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .email-form {
+      width: 100%;
+      max-width: 600px;
+      text-align: left;
+      display: none;
+      margin-top: -39px;
+    }
+
+    .email-form input {
+      background-color: var(--black);
+      border: 1px solid var(--indigo);
+      color: var(--indigo);
+      padding: 10px;
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      width: calc(100% - 120px);
+    }
+
+    .email-form button {
+      background-color: var(--indigo);
+      border: none;
+      color: var(--black);
+      padding: 10px;
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      cursor: pointer;
+      width: 100px;
+    }
+
+    .status-menu {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 20px 30px;
+      position: relative;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .status-item {
+      text-align: center;
+    }
+
+    .progress-bar {
+      width: 100%;
+      background-color: var(--black);
+      border: 1px solid var(--indigo);
+      height: 20px;
+      margin-top: 5px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background-color: var(--indigo);
+      width: 0%;
+      transition: width 0.5s ease-in-out;
+    }
+
+    #scanline {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50px;
+      background: linear-gradient(
+        0deg,
+        rgba(26, 66, 244, 0) 0%,
+        rgba(26, 66, 244, 0.1) 50%,
+        rgba(26, 66, 244, 0) 100%
+      );
+      animation: scanline 3s linear infinite;
+      opacity: 0.5;
+    }
+
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100vh); }
+    }
+
+    #crt-lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(26, 66, 244, 0.1),
+          rgba(26, 66, 244, 0.1) 1px,
+          transparent 1px,
+          transparent 3px
+        ),
+        repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0.1),
+          rgba(0, 0, 0, 0.1) 1px,
+          transparent 1px,
+          transparent 2px
+        );
+      pointer-events: none;
+    }
+
+    #flicker {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(26, 66, 244, 0.03);
+      animation: flicker 0.1s infinite;
+      pointer-events: none;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 0.1; }
+      100% { opacity: 1; }
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 15px;
+      height: 30px;
+      background-color: var(--indigo);
+      animation: blink 0.7s infinite;
+      vertical-align: middle;
+      position: relative;
+      top: -3px;
+    }
+
+    @keyframes blink {
+      0% { opacity: 0; }
+      50% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    @media (max-width: 768px) {
+      .terminal-area {
+        font-size: 18px;
+      }
+      .start-prompt {
+        font-size: 24px;
+      }
+
+      .status-item {
+        margin-bottom: 10px;
+      }
+      .email-form input,
+      .email-form button {
+        font-size: 16px;
+      }
+    }
+
+    /* New styles for animated dots */
+    .animated-dots::after {
+      content: '...';
+      animation: dots 1.5s steps(4, end) infinite;
+      display: inline-block;
+      width: 1.5em;
+      text-align: left;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: ''; }
+      40% { content: '.'; }
+      60% { content: '..'; }
+      80%, 100% { content: '...'; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="terminal">
+    <div id="scanline"></div>
+    <div id="crt-lines"></div>
+    <div id="flicker"></div>
+  </div>
+  <div class="content">
+    <div class="header">
+      <img src="./assets/img/cyborg-logo-indigo.svg" alt="Cyborg Logo" style="max-width:200px; margin: 30px 0 20px;">
+    </div>
+    <div class="terminal-area">
+      <div class="start-prompt" id="startPrompt"></div>
+      <div id="terminalText"></div>
+      <div class="email-form" id="emailForm">
+        <script async data-uid="01c20ba040" src="https://cyborg.ck.page/01c20ba040/index.js"></script>
+      </div>
+    </div>
+    <div class="status-menu">
+      <div class="status-item">
+        <div>System Status</div>
+        <div id="systemStatus">Online</div>
+      </div>
+      <div class="status-item">
+        <div>Diagnostic Scan</div>
+        <div id="diagnosticScan">0%</div>
+        <div class="progress-bar">
+          <div class="progress-bar-fill" id="progressBarFill"></div>
+        </div>
+      </div>
+      <div class="status-item">
+        <div>Available Enhancements</div>
+        <div id="availableEnhancements">Unknown</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const terminalText = document.getElementById('terminalText');
+    const startPrompt = document.getElementById('startPrompt');
+    const emailForm = document.getElementById('emailForm');
+    const systemStatus = document.getElementById('systemStatus');
+    const diagnosticScan = document.getElementById('diagnosticScan');
+    const progressBarFill = document.getElementById('progressBarFill');
+    const availableEnhancements = document.getElementById('availableEnhancements');
+
+    const messages = [
+      "Scanning neural pathways...",
+      "Identifying potential enhancement areas...",
+      "Calibrating cybernetic integration protocols...",
+      "Preparing enhancement options...",
+      "Your cybernetic upgrades will soon be ready for deployment.",
+      "Enter your email below to be notified."
+    ];
+
+    let messageIndex = 0;
+    let charIndex = 0;
+    let isTyping = false;
+
+    // Audio setup
+    const crtHum = new Audio('./assets/audio/zapsplat_science_fiction_forcefield_energy_hum_constant_92604.mp3');
+    const typingSound = new Audio('./assets/audio/zapsplat_science_fiction_beep_computer_002_44986.mp3');
+
+    crtHum.loop = true;
+    crtHum.volume = 0.5;
+    typingSound.volume = 0.08;
+
+    function typeWriter() {
+      if (messageIndex < messages.length) {
+        if (charIndex < messages[messageIndex].length) {
+          terminalText.innerHTML += messages[messageIndex].charAt(charIndex);
+          charIndex++;
+          typingSound.currentTime = 0;
+          typingSound.play();
+          setTimeout(typeWriter, 50);
+        } else {
+          terminalText.innerHTML += '<br><br>';
+          messageIndex++;
+          charIndex = 0;
+          updateProgress();
+          if (messageIndex < messages.length) {
+            setTimeout(typeWriter, 1000);
+          } else {
+            isTyping = false;
+            showEmailForm();
+            updateStatusMenu();
+            addCursor();
           }
-        </style>
-        <div class="row justify-content-between align-items-center fade-in" id="fadeElement">
-          <div class="col-12 col-md-6 pt-7">
-            <script async data-uid="01c20ba040" src="https://cyborg.ck.page/01c20ba040/index.js"></script>
-          </div>
-        </div> <!-- / .row -->
-      </div> <!-- / .container -->
-    </section>
+        }
+      }
+    }
 
-    <script>
-      setTimeout(() => {
-        const element = document.getElementById('fadeElement');
-        element.style.opacity = 1;
-      }, 19000);
-    </script>
+    function updateProgress() {
+      const progress = Math.min(100, Math.round((messageIndex / messages.length) * 100));
+      diagnosticScan.textContent = `${progress}%`;
+      progressBarFill.style.width = `${progress}%`;
+    }
 
-    <!-- JAVASCRIPT -->
-    <!-- Vendor JS -->
-    <script src="./assets/js/vendor.bundle.js"></script>
-    
-    <!-- Theme JS -->
-    <script src="./assets/js/theme.bundle.js"></script>
+    function updateStatusMenu() {
+      systemStatus.textContent = 'Online';
+      systemStatus.classList.remove('animated-dots');
+      availableEnhancements.textContent = 'Ready';
+    }
 
-  </body>
+    function startCyborgInterface() {
+      startPrompt.style.display = 'none';
+      if (!isTyping) {
+        isTyping = true;
+        crtHum.play();
+        systemStatus.textContent = 'Working';
+        systemStatus.classList.add('animated-dots');
+        typeWriter();
+      }
+    }
+
+    function setStartPrompt() {
+      startPrompt.textContent = 'Press ENTER or CLICK HERE to begin diagnostic scan';
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && !isTyping) {
+          startCyborgInterface();
+        }
+      });
+
+      // For mobile devices, allow touch to start as well
+      startPrompt.addEventListener('click', function() {
+        if (!isTyping) {
+          startCyborgInterface();
+        }
+      });
+    }
+
+    function addCursor() {
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor';
+      terminalText.appendChild(cursor);
+    }
+
+    function showEmailForm() {
+      emailForm.style.display = 'block';
+    }
+
+    setStartPrompt();
+
+    document.getElementById('submitEmail').addEventListener('click', function() {
+      const email = document.getElementById('emailInput').value;
+      if (email) {
+        alert('Thank you! You will be notified when your cybernetic enhancements are ready.');
+      } else {
+        alert('Please enter a valid email address.');
+      }
+    });
+  </script>
+</body>
 </html>
