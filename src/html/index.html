@@ -287,6 +287,7 @@
   </div>
 
   <script>
+    // DOM elements
     const terminalText = document.getElementById('terminalText');
     const startPrompt = document.getElementById('startPrompt');
     const emailForm = document.getElementById('emailForm');
@@ -295,6 +296,7 @@
     const progressBarFill = document.getElementById('progressBarFill');
     const availableEnhancements = document.getElementById('availableEnhancements');
 
+    // Messages to be typed
     const messages = [
       "Scanning neural pathways...",
       "Identifying potential enhancement areas...",
@@ -304,25 +306,55 @@
       "Enter your email below to be notified."
     ];
 
+    // State variables
     let messageIndex = 0;
     let charIndex = 0;
     let isTyping = false;
 
     // Audio setup
-    const crtHum = new Audio('{{webRoot}}/assets/audio/zapsplat_science_fiction_forcefield_energy_hum_constant_92604.mp3');
-    const typingSound = new Audio('{{webRoot}}/assets/audio/zapsplat_science_fiction_beep_computer_002_44986.mp3');
-
+    const crtHum = new Audio('{{webRoot}}/assets/audio/crtHum.mp3');
     crtHum.loop = true;
     crtHum.volume = 0.5;
-    typingSound.volume = 0.08;
 
+    let audioContext;
+    let typingSoundBuffer;
+    let gainNode;
+
+    // Function to load audio
+    function loadAudio() {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      gainNode = audioContext.createGain();
+      gainNode.connect(audioContext.destination);
+
+      // Set the volume (0.05 is quite low, adjust as needed)
+      gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+
+      fetch('{{webRoot}}/assets/audio/typingSound.mp3')
+        .then(response => response.arrayBuffer())
+        .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+        .then(audioBuffer => {
+          typingSoundBuffer = audioBuffer;
+        })
+        .catch(error => console.error('Error loading audio:', error));
+    }
+
+    // Function to play typing sound
+    function playTypingSound() {
+      if (audioContext && typingSoundBuffer) {
+        const source = audioContext.createBufferSource();
+        source.buffer = typingSoundBuffer;
+        source.connect(gainNode);
+        source.start(0, 0, 0.05); // Play only 50ms of the sound
+      }
+    }
+
+    // Function to type out messages
     function typeWriter() {
       if (messageIndex < messages.length) {
         if (charIndex < messages[messageIndex].length) {
           terminalText.innerHTML += messages[messageIndex].charAt(charIndex);
           charIndex++;
-          typingSound.currentTime = 0;
-          typingSound.play();
+          playTypingSound();
           setTimeout(typeWriter, 50);
         } else {
           terminalText.innerHTML += '<br><br>';
@@ -341,29 +373,34 @@
       }
     }
 
+    // Function to update progress bar
     function updateProgress() {
       const progress = Math.min(100, Math.round((messageIndex / messages.length) * 100));
       diagnosticScan.textContent = `${progress}%`;
       progressBarFill.style.width = `${progress}%`;
     }
 
+    // Function to update status menu
     function updateStatusMenu() {
       systemStatus.textContent = 'Online';
       systemStatus.classList.remove('animated-dots');
       availableEnhancements.textContent = 'Ready';
     }
 
+    // Function to start the Cyborg interface
     function startCyborgInterface() {
       startPrompt.style.display = 'none';
       if (!isTyping) {
         isTyping = true;
-        crtHum.play();
+        loadAudio(); // Load audio when starting
+        crtHum.play().catch(e => console.log("Audio play failed:", e));
         systemStatus.textContent = 'Working';
         systemStatus.classList.add('animated-dots');
         typeWriter();
       }
     }
 
+    // Function to set up start prompt
     function setStartPrompt() {
       startPrompt.textContent = 'Press ENTER or CLICK HERE to begin diagnostic scan';
       document.addEventListener('keydown', function(event) {
@@ -380,26 +417,20 @@
       });
     }
 
+    // Function to add blinking cursor
     function addCursor() {
       const cursor = document.createElement('span');
       cursor.className = 'cursor';
       terminalText.appendChild(cursor);
     }
 
+    // Function to show email form
     function showEmailForm() {
       emailForm.style.display = 'block';
     }
 
+    // Initialize the page
     setStartPrompt();
-
-    document.getElementById('submitEmail').addEventListener('click', function() {
-      const email = document.getElementById('emailInput').value;
-      if (email) {
-        alert('Thank you! You will be notified when your cybernetic enhancements are ready.');
-      } else {
-        alert('Please enter a valid email address.');
-      }
-    });
   </script>
 </body>
 </html>
